@@ -33,6 +33,11 @@ ALLOWED_HOSTS = []
 # 由于复写了user模型，我们需要重载AUTH_USER_MODEL参数，导入我们复写后的模型
 AUTH_USER_MODEL = 'users.UserProfile'
 
+# 导入复写后的认证后台
+AUTHENTICATION_BACKENDS = (
+    'users.views.CustomBackend',
+)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,11 +50,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     # 静态文件
     'django.contrib.staticfiles',
+
     # 用户注册的app
     'users',
     'course',
     'organization',
     'operation',
+    # 验证码
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +71,16 @@ MIDDLEWARE = [
 
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# SMTP功能，发送邮件
+EMAIL_HOST = 'smtp.126.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'wolfking816@126.com'
+EMAIL_HOST_PASSWORD = 'simondmhz816'
+EMAIL_USER_TLS = True
+EMAIL_FROM = 'wolfking816@126.com'
+
 
 ROOT_URLCONF = 'MxOnline2.urls'
 
@@ -96,7 +114,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mxonline2',
         'USER': 'postgres',
-        'PASSWORD': 'MAQING',
+        'PASSWORD': 'maqing',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }

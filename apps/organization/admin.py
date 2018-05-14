@@ -16,8 +16,8 @@ class CourseOrgAdmin(admin.ModelAdmin):
 
 
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('name', 'org', 'work_year', 'work_company', 'add_time')
-    search_fields = ('name', 'org', 'work_year', 'work_company')
+    list_display = ('name', 'organization', 'work_year', 'work_company', 'add_time')
+    search_fields = ('name', 'organization', 'work_year', 'work_company')
     list_filter = ('name', 'org__name', 'work_year', 'work_company', 'click_nums', 'fav_nums', 'add_time')
 
 

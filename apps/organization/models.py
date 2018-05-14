@@ -42,7 +42,7 @@ class CourseOrg(models.Model):
     desc = models.TextField(verbose_name="机构描述")
     category = models.CharField(verbose_name="机构类别", max_length=20, choices=ORG_CHOICES, default='pxjg')
     tag = models.CharField(verbose_name="机构标签", max_length=20, default="全国知名")
-    image = models.ImageField(verbose_name="封面图", upload_to='org/%Y/%m')
+    image = models.ImageField(verbose_name="封面图", upload_to='organization/%Y/%m')
     address = models.CharField(verbose_name="机构地址", max_length=200)
     city = models.ForeignKey(City, verbose_name="所在城市", on_delete=models.CASCADE)
     click_nums = models.IntegerField(verbose_name="点击数", default=0)

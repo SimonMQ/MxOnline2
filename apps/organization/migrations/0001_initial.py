@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('desc', models.TextField(verbose_name='机构描述')),
                 ('category', models.CharField(choices=[('pxjg', '培训机构'), ('gx', '高校'), ('gr', '个人')], default='pxjg', max_length=20, verbose_name='机构类别')),
                 ('tag', models.CharField(default='全国知名', max_length=20, verbose_name='机构标签')),
-                ('image', models.ImageField(upload_to='org/%Y/%m', verbose_name='封面图')),
+                ('image', models.ImageField(upload_to='organization/%Y/%m', verbose_name='封面图')),
                 ('address', models.CharField(max_length=200, verbose_name='机构地址')),
                 ('click_nums', models.IntegerField(default=0, verbose_name='点击数')),
                 ('learn_nums', models.IntegerField(default=0, verbose_name='学习人数')),
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
                 ('click_nums', models.IntegerField(default=0, verbose_name='点击数')),
                 ('fav_nums', models.IntegerField(default=0, verbose_name='收藏数')),
                 ('add_time', models.DateTimeField(default=datetime.datetime.now, verbose_name='添加时间')),
-                ('org', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='organization.CourseOrg', verbose_name='所属机构')),
+                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='organization.CourseOrg', verbose_name='所属机构')),
             ],
             options={
                 'verbose_name': '教师',
