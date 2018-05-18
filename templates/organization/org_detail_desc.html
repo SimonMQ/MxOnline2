@@ -1,0 +1,15 @@
+{% extends 'organization/org_detail_base.html' %}
+{% load staticfiles %}
+
+{% block title %}Simon|机构详情页{% endblock %}
+{% block page_path %}机构详情{% endblock %}
+{% block right_content %}
+<div class="right companycenter layout" >
+        <div class="head">
+            <h1>机构介绍</h1>
+        </div>
+        <div class="des">
+            <p>{{ organization.desc }}<p>
+        </div>
+    </div>
+{% endblock %}

@@ -77,7 +77,7 @@ MIDDLEWARE = [
 EMAIL_HOST = 'smtp.126.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'wolfking816@126.com'
-EMAIL_HOST_PASSWORD = 'simondmhz816'
+EMAIL_HOST_PASSWORD = 'simon'
 EMAIL_USER_TLS = True
 EMAIL_FROM = 'wolfking816@126.com'
 
@@ -98,6 +98,8 @@ TEMPLATES = [
 
                 # admin依赖库
                 'django.contrib.messages.context_processors.messages',
+                # 图片处理器，用于在media前面加上MEDIA_URL
+                'django.template.context_processors.media',
             ],
         },
     },

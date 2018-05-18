@@ -1,0 +1,45 @@
+{% extends 'organization/org_detail_base.html' %}
+{% load staticfiles %}
+
+{% block title %}Simon|机构课程列表页{% endblock %}
+{% block page_path %}机构课程{% endblock %}
+{% block right_content %}
+<div class="right companycenter layout" >
+		<div class="head">
+			<h1>机构课程</h1>
+		</div>
+		<div class="brief group_list">
+            {% for course in all_courses %}
+                <div class="module1_5 box">
+                    <a class="comp-img-box" href="{% url 'course:course_detail' course.id %}">
+
+                        <img width="214" height="195" src="{{ MEDIA_URL }}{{ course.image }}"/>
+                    </a>
+                    <div class="des">
+                        <a href="../course/course_detail.html"><h2>{{ course.name }}</h2></a>
+                        <span class="fl">课时：<i class="key">{{ course.learn_times }}</i></span>
+                        <span class="fr">学习人数：{{ course.learn_nums }}</span>
+                    </div>
+                    <div class="bottom">
+                        <span class="fl">{{ course.organization }}</span>
+                         <span class="star fr  notlogin
+                            " data-favid="13" data-fav-type="4">
+                            {{ course.organization.fav_nums }}
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+		</div>
+		<div class="pageturn">
+            <ul class="pagelist">
+                {% if all_courses.has_previous %}
+                    <li class="long"><a href="?page={{ all_courses.previous_page_number }}">上一页</a></li>
+                {% endif %}
+                <li class="long">第 {{ all_courses.number }} 页 / 共 {{ all_courses.paginator.num_pages }} 页</li>
+                {% if all_courses.has_next %}
+                    <li class="long"><a href="?page={{ all_courses.next_page_number }}">下一页</a></li>
+                {% endif %}
+            </ul>
+        </div>
+</div>
+{% endblock %}

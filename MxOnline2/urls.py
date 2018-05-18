@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
-import users.urls
+import users.urls, organization.urls, course.urls
 from users.views import IndexView, LoginView, LogoutView, RegisterView, ActiveUserView, ForgetPwdView, ResetPwdView, ModifyPwdView
+from django.views.static import serve
+from MxOnline2.settings import MEDIA_ROOT
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,8 +33,11 @@ urlpatterns = [
     path('modify_pwd/', ModifyPwdView.as_view(), name='modify_pwd'),
     path('captcha/', include('captcha.urls')),
 
+    # 配置图片路径
+    re_path(r'^media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
+
     path('users/', include(users.urls, namespace='users')),
-    path('organization/', include(users.urls, namespace='organization')),
-    path('course/', include(users.urls, namespace='course')),
+    path('organization/', include(organization.urls, namespace='organization')),
+    path('course/', include(course.urls, namespace='course')),
 
 ]

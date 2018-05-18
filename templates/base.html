@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
-	<title>{% block title %}{% endblock %}</title>
+	<title>{% block title %}Simon|首页{% endblock %}</title>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/animate.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
@@ -38,7 +38,7 @@
 									</dd>
 								</dl>
 								<div class="btn">
-									<a class="personcenter fl" href="{% url 'usercenter_info' %}">进入个人中心</a>
+									<a class="personcenter fl" href="">进入个人中心</a>
 									<a class="fr" href="{% url 'logout' %}">退出</a>
 								</div>
 							</div>
@@ -50,7 +50,7 @@
 
 				</div>
 			</div>
-
+			{% block custom_header %}
             <div class="middle">
                 <div class="wp">
                     <a href="{% url 'index' %}"><img class="fl" src="{% static 'images/logo.jpg' %}"/></a>
@@ -78,19 +78,19 @@
 						<ul>
 							<li class="active" ><a href="{% url 'index' %}">首页</a></li>
 							<li >
-								<a href="{% url 'course_list' %}">
+								<a href="{% url 'course:course_list' %}">
 									公开课<img class="hot" src="{% static 'images/nav_hot.png' %}">
 								</a>
 							</li>
 							<li >
-								<a href="{% url 'teacher_list' %}">授课教师</a>
+								<a href="">授课教师</a>
 							</li>
-							<li ><a href="{% url 'organization_list' %}">授课机构</a></li>
+							<li ><a href="{% url 'organization:organization_list' %}">授课机构</a></li>
 						</ul>
 					</div>
 				</div>
 			</nav>
-            
+            {% endblock %}
 			</div>
     </header>
 </section>

@@ -31,7 +31,7 @@ class City(models.Model):
         return self.name
 
 
-class CourseOrg(models.Model):
+class Organization(models.Model):
     ORG_CHOICES = (
         ('pxjg', '培训机构'),
         ('gx', '高校'),
@@ -49,6 +49,8 @@ class CourseOrg(models.Model):
     learn_nums = models.IntegerField(verbose_name="学习人数", default=0)
     fav_nums = models.IntegerField(verbose_name="收藏数", default=0)
     course_nums = models.IntegerField(verbose_name="课程数", default=0)
+    is_authentication = models.BooleanField(verbose_name="是否认证", default=False)
+    is_gold = models.BooleanField(verbose_name="金牌机构", default=False)
     add_time = models.DateTimeField(verbose_name="添加时间", default=datetime.now)
 
     class Meta:
@@ -58,9 +60,17 @@ class CourseOrg(models.Model):
     def __str__(self):
         return self.name
 
+    # 定义一个方法，可以获取当前机构的课程数目和教师数目
+    # 也可以在view中写，但是重复造轮子，每次调用都要写，写在模型里方便调用
+    def get_course_nums(self):
+        return self.course_set.all().count()
+
+    def get_teacher_nums(self):
+        return self.teacher_set.all().count()
+
 
 class Teacher(models.Model):
-    org = models.ForeignKey(CourseOrg, verbose_name="所属机构", on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, verbose_name="所属机构", on_delete=models.CASCADE)
     name = models.CharField(verbose_name="姓名", max_length=20)
     age = models.IntegerField(verbose_name="年龄", default=0)
     image = models.ImageField(verbose_name="头像", upload_to='teacher/%Y/%m', default='', null=True, blank=True)

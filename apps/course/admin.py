@@ -8,7 +8,7 @@ class CourseAdmin(admin.ModelAdmin):
     # 设置fieldsets 控制管理“添加”和 “更改” 页面的布局，顺便可以给这些字段排序
     fieldsets = (
         (None, {
-            'fields': ('name', 'desc', 'tag', 'is_banner', ('course_org', 'teacher'), 'degree', 'learn_times', ('click_nums', 'learn_nums', 'fav_nums'), 'category')
+            'fields': ('name', 'desc', 'tag', 'is_banner', ('organization', 'teacher'), 'degree', 'learn_times', ('click_nums', 'learn_nums', 'fav_nums'), 'category')
         }),
         ('其它选项', {
             'fields': ('detail', 'image', 'you_need_know', 'teacher_tell', 'add_time')
@@ -16,7 +16,7 @@ class CourseAdmin(admin.ModelAdmin):
     )
 
     # 指定修改页面上显示的字段，如果不指定，则只显示__str__()指定的那一列。
-    list_display = ('name', 'desc', 'course_org', 'teacher', 'is_banner', 'colored_degree', 'learn_times', 'learn_nums')
+    list_display = ('name', 'desc', 'organization', 'teacher', 'is_banner', 'colored_degree', 'learn_times', 'learn_nums')
     search_fields = ('name', 'desc', 'detail', 'degree', 'learn_nums')
     list_filter = ('name', 'desc', 'detail', 'degree', 'learn_times', 'learn_nums')
 

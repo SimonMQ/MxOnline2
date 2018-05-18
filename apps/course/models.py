@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from organization.models import CourseOrg, Teacher
+from organization.models import Organization, Teacher
 from django.utils.html import format_html
 
 
@@ -11,9 +11,9 @@ class Course(models.Model):
         ('zj', '中级'),
         ('gj', '高级'),
     )
-    course_org = models.ForeignKey(CourseOrg, verbose_name="所属机构", on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, verbose_name="所属机构", on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, verbose_name="授课教师", on_delete=models.CASCADE)
-    name = models.CharField(verbose_name="名称", max_length=20)
+    name = models.CharField(verbose_name="名称", max_length=50)
     desc = models.CharField(verbose_name="课程描述", max_length=255)
     detail = models.TextField(verbose_name="课程详情")
     image = models.ImageField(verbose_name="封面图", upload_to='course/%Y/%m')
@@ -51,6 +51,19 @@ class Course(models.Model):
         verbose_name = "课程"
         verbose_name_plural = verbose_name
 
+    # 获取当前课程的所有章节
+    def get_lessons(self):
+        return self.lesson_set.all()
+
+    def get_resources(self):
+        return self.courseresource_set.all()
+
+    def get_lesson_nums(self):
+        return self.lesson_set.all().count()
+
+    def get_learn_users(self):
+        return self.usercourse_set.all()[:5]
+
     def __str__(self):
         return self.name
 
@@ -66,6 +79,9 @@ class Lesson(models.Model):
 
     def __str__(self):
         return '《{0}》课程的章节 >> {1}'.format(self.course, self.name)
+
+    def get_videos(self):
+        return self.video_set.all()
 
 
 class Video(models.Model):
