@@ -5,6 +5,7 @@ from operation.models import UserFavorite, CourseComment, UserCourse
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from utils.mixin_utils import LoginRequiredMixin
+from django.db.models import Q
 
 
 class CourseListView(View):
@@ -19,6 +20,11 @@ class CourseListView(View):
             all_courses = all_courses.order_by('-click_nums')
         elif sort == 'students':
             all_courses = all_courses.order_by('-learn_nums')
+
+        # 搜索功能，使用icontain查询
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            all_courses = all_courses.filter(Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords) | Q(detail__icontains=search_keywords))
 
         # 翻页功能
         paginator = Paginator(all_courses, 3)

@@ -23,13 +23,13 @@
 				<li>
 					<h2>机构类别</h2>
 					<div class="cont">
-                        <a href="?city={{ city_id }}"><span class="{% if category_id == '' %}active2{% endif %}">全部</span></a>
+                        <a href="?city={{ city_id }}&keywords={{ search_keywords }}"><span class="{% if category_id == '' %}active2{% endif %}">全部</span></a>
 
-                            <a href="?ct=pxjg&city={{ city_id }}"><span class="{% if category_id == 'pxjg' %}active2{% endif %}">培训机构</span></a>
+                            <a href="?ct=pxjg&city={{ city_id }}&keywords={{ search_keywords }}"><span class="{% if category_id == 'pxjg' %}active2{% endif %}">培训机构</span></a>
 
-                            <a href="?ct=gx&city={{ city_id }}"><span class="{% if category_id == 'gx' %}active2{% endif %}">高校</span></a>
+                            <a href="?ct=gx&city={{ city_id }}&keywords={{ search_keywords }}"><span class="{% if category_id == 'gx' %}active2{% endif %}">高校</span></a>
 
-                            <a href="?ct=gr&city={{ city_id }}"><span class="{% if category_id == 'gr' %}active2{% endif %}">个人</span></a>
+                            <a href="?ct=gr&city={{ city_id }}&keywords={{ search_keywords }}"><span class="{% if category_id == 'gr' %}active2{% endif %}">个人</span></a>
 
 					</div>
 				</li>
@@ -37,9 +37,9 @@
 					<h2>所在地区</h2>
 					<div class="more">更多</div>
 					<div class="cont">
-                        <a href="?ct={{ category_id }}"><span class="{% if city_id == '' %}active2{% endif %}">全部</span></a>
+                        <a href="?ct={{ category_id }}&keywords={{ search_keywords }}"><span class="{% if city_id == '' %}active2{% endif %}">全部</span></a>
                             {% for city in all_cities %}
-                                <a href="?city={{ city.id }}&ct={{ category_id }}"><span class="{% if city.id|stringformat:'i' == city_id %}active2{% endif %}">{{ city.name }}</span></a>
+                                <a href="?city={{ city.id }}&ct={{ category_id }}&keywords={{ search_keywords }}"><span class="{% if city.id|stringformat:'i' == city_id %}active2{% endif %}">{{ city.name }}</span></a>
                             {% endfor %}
 					</div>
 				</li>
@@ -50,9 +50,9 @@
 		<div class="layout">
 			<div class="head">
 				<ul class="tab_header">
-					<li class="{% if sort_id == '' %}active{% endif %}"><a href="?city={{ city_id }}&ct={{ category_id }}">全部</a> </li>
-					<li class="{% if sort_id == 'students' %}active{% endif %}"><a href="?sort=students&city={{ city_id }}&ct={{ category_id }}">学习人数 &#8595;</a></li>
-					<li class="{% if sort_id == 'courses' %}active{% endif %}"><a href="?sort=courses&city={{ city_id }}&ct={{ category_id }}">课程数 &#8595;</a></li>
+					<li class="{% if sort_id == '' %}active{% endif %}"><a href="?city={{ city_id }}&ct={{ category_id }}&keywords={{ search_keywords }}">全部</a> </li>
+					<li class="{% if sort_id == 'students' %}active{% endif %}"><a href="?sort=students&city={{ city_id }}&ct={{ category_id }}&keywords={{ search_keywords }}">学习人数 &#8595;</a></li>
+					<li class="{% if sort_id == 'courses' %}active{% endif %}"><a href="?sort=courses&city={{ city_id }}&ct={{ category_id }}&keywords={{ search_keywords }}">课程数 &#8595;</a></li>
 				</ul>
 			</div>
             {% for organization in all_organizations %}

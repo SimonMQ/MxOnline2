@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import View
 from .models import City, Organization, Teacher
+from course.models import Course
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import UserAskForm
 from operation.models import UserAsk, UserFavorite
+from django.db.models import Q
 
 
 # Create your views here.
@@ -24,6 +26,12 @@ class OrgListView(View):
         city_id = request.GET.get('city', '')
         if city_id:
             all_organizations = all_organizations.filter(city=int(city_id))
+
+        # 搜索功能，使用icontain查询
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            all_organizations = all_organizations.filter(
+                Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords))
 
         # 排序筛选
         sort_id = request.GET.get('sort', '')
@@ -56,6 +64,7 @@ class OrgListView(View):
             'category_id': category_id,
             'city_id': city_id,
             'sort_id': sort_id,
+            'search_keywords': search_keywords,
         }
         return render(request, 'organization/org_list.html', context=context)
 
@@ -79,13 +88,31 @@ class AddFavView(View):
         if not request.user.is_authenticated:
             return HttpResponse({'status': 'fail', 'msg': '用户未登录'}, content_type='application/json')
 
-        # 获取收藏id即类型，如果数据库中已存在，那么取消收藏；
+        # 获取收藏id即类型，如果数据库中已存在，那么取消收藏，并且收藏数-1
         id = request.POST.get('fav_id', None)
         type = request.POST.get('fav_type', None)
         if id and type:
             exist_record = UserFavorite.objects.filter(user=request.user, fav_id=int(id), fav_type=int(type))
             if exist_record:
                 exist_record.delete()
+                if int(type) == 1:
+                    org = Organization.objects.get(id=int(id))
+                    org.fav_nums -= 1
+                    if org.fav_nums < 0:
+                        org.fav_nums = 0
+                    org.save()
+                elif int(type) == 2:
+                    course = Course.objects.get(id=int(id))
+                    course.fav_nums -= 1
+                    if course.fav_nums < 0:
+                        course.fav_nums = 0
+                    course.save()
+                elif int(type) == 3:
+                    teacher = Teacher.objects.get(id=int(id))
+                    teacher.fav_nums -= 1
+                    if teacher.fav_nums < 0:
+                        teacher.fav_nums = 0
+                    teacher.save()
                 return HttpResponse({'status': 'success', 'msg': '收藏'}, content_type='application/json')
             else:
                 user_fav = UserFavorite()
@@ -93,6 +120,21 @@ class AddFavView(View):
                 user_fav.fav_id = int(id)
                 user_fav.fav_type = int(type)
                 user_fav.save()
+
+                # 收藏数+1
+                if int(type) == 1:
+                    org = Organization.objects.get(id=int(id))
+                    org.fav_nums += 1
+                    org.save()
+                elif int(type) == 2:
+                    course = Course.objects.get(id=int(id))
+                    course.fav_nums += 1
+                    course.save()
+                elif int(type) == 3:
+                    teacher = Teacher.objects.get(id=int(id))
+                    teacher.fav_nums += 1
+                    teacher.save()
+
                 return HttpResponse({'status': 'success', 'msg': '已收藏'}, content_type='application/json')
         else:
             return HttpResponse({'status': 'fail', 'msg': '收藏出错'}, content_type='application/json')
@@ -193,3 +235,71 @@ class OrgDetailDescView(View):
             'has_fav': has_fav,
         }
         return render(request, 'organization/org_detail_desc.html', context=context)
+
+
+class TeacherListView(View):
+    def get(self, request):
+        all_teachers = Teacher.objects.all()
+
+        teacher_nums = all_teachers.count()
+
+        # 搜索功能，使用icontain查询
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            all_teachers = all_teachers.filter(name__icontains=search_keywords)
+
+        sort = request.GET.get('sort', '')
+        if sort == 'hot':
+            all_teachers = all_teachers.order_by('-click_nums')
+
+        # 翻页功能
+        paginator = Paginator(all_teachers, 3)
+        page = request.GET.get('page')
+        teachers = paginator.get_page(page)
+
+        hot_teachers = all_teachers.order_by('-click_nums')[:8]
+        context = {
+            'all_teachers': teachers,
+            'teacher_nums': teacher_nums,
+            'hot_teachers': hot_teachers,
+            'sort': sort,
+            'search_keywords': search_keywords,
+        }
+        return render(request, 'organization/teacher_list.html', context=context)
+
+
+class TeacherDetailView(View):
+    def get(self, request, teacher_id):
+        teacher = Teacher.objects.get(id=int(teacher_id))
+        teacher_courses = teacher.course_set.all()
+        organization = teacher.organization
+        # 教师点击数+1
+        teacher.click_nums += 1
+        teacher.save()
+        # 翻页功能
+        paginator = Paginator(teacher_courses, 3)
+        page = request.GET.get('page')
+        teacher_courses = paginator.get_page(page)
+
+        all_teachers = Teacher.objects.all()
+        hot_teachers = all_teachers.order_by('-click_nums')[:8]
+
+        # 用户收藏功能，如果用户未登录，显示未收藏；用户已登录，可根据用户的收藏数据判断
+        has_fav_teacher = False
+        has_fav_org = False
+
+        if request.user.is_authenticated:
+            if UserFavorite.objects.filter(user=request.user, fav_id=teacher.id, fav_type=3):
+                has_fav_teacher = True
+            if UserFavorite.objects.filter(user=request.user, fav_id=organization.id, fav_type=1):
+                has_fav_org = True
+
+        context = {
+            'teacher': teacher,
+            'organization': organization,
+            'teacher_courses': teacher_courses,
+            'hot_teachers': hot_teachers,
+            'has_fav_teacher': has_fav_teacher,
+            'has_fav_org': has_fav_org,
+        }
+        return render(request, 'organization/teacher_detail.html', context=context)

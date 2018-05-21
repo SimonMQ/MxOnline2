@@ -1,20 +1,38 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic.base import View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.backends import ModelBackend
-from users.models import UserProfile, EmailVerifyRecord
+from users.models import UserProfile, EmailVerifyRecord, Banner
+from course.models import Course
+from operation.models import UserCourse, UserFavorite, UserMessage
+from organization.models import Organization, Teacher
 from django.db.models import Q
-from .forms import LoginForm, RegisterForm, ForgetPwdForm, ResetPwdForm
+from .forms import LoginForm, RegisterForm, ForgetPwdForm, ResetPwdForm, UserInfoForm
 from utils import send_email
+from .forms import UploadImageForm
+from django.http import HttpResponse
+import json
+from utils.mixin_utils import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 
 # 首页视图
 class IndexView(View):
     def get(self, request):
-        return render(request, 'index.html')
+        all_banners = Banner.objects.all().order_by('index')
+        courses = Course.objects.filter(is_banner=False)[:6]
+        banner_courses = Course.objects.filter(is_banner=True)[:3]
+        organizations = Organization.objects.all()[:15]
+        context = {
+            'all_banners': all_banners,
+            'courses': courses,
+            'banner_courses': banner_courses,
+            'organizations': organizations,
+        }
+        return render(request, 'index.html', context=context)
 
 
 # 复写ModelBackend的authenticate方法。
@@ -184,3 +202,115 @@ class ModifyPwdView(View):
                 return render(request, 'reset_pwd.html', {'email': email, 'reset_form': reset_form, 'msg': '两次输入的密码不一致'})
         else:
             return render(request, 'reset_pwd.html', {'email': email, 'reset_form': reset_form})
+
+
+# 用户中心页
+class UserInfoView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'users/usercenter_info.html')
+
+    def post(self, request):
+        user_info_form = UserInfoForm(request.POST, instance=request.user)
+        if user_info_form.is_valid():
+            user_info_form.save()
+            return HttpResponse('{"status": "success"}', content_type='application/json')
+        else:
+            return HttpResponse(json.dumps(user_info_form.errors), content_type='application/json')
+
+
+class UploadImageView(View):
+    def post(self, request):
+        upload_image_form = UploadImageForm(request.POST, request.FILES)
+        if upload_image_form.is_valid():
+            image = upload_image_form.cleaned_data['image']
+            request.user.image = image
+            request.user.save()
+            return HttpResponse('{"status": "success"}', content_type='application/json')
+        else:
+            return HttpResponse('{"status": "fail"}', content_type='application/json')
+
+
+class UpdatePwdView(View):
+    def post(self, request):
+        reset_form = ResetPwdForm(request.POST)
+        if reset_form.is_valid():
+            password1 = request.POST.get('password1', None)
+            password2 = request.POST.get('password2', None)
+            if password1 == password2:
+                user_profile = request.user
+                user_profile.password = make_password(password1)
+                user_profile.save()
+                return HttpResponse('{"status": "success"}', content_type='application/json')
+            else:
+                return HttpResponse('{"status": "fail", "msg": "密码不一致"}',  content_type='application/json')
+        else:
+            return HttpResponse(json.dumps(reset_form.errors), content_type='application/json')
+
+
+class MyCourseView(View):
+    def get(self, request):
+        user_courses = UserCourse.objects.filter(user=request.user)
+        context = {
+            'user_courses': user_courses,
+        }
+        return render(request, 'users/usercenter_mycourse.html', context=context)
+
+
+class MyFavOrgView(View):
+    def get(self, request):
+        user_fav_orgs = UserFavorite.objects.filter(user=request.user, fav_type=1)
+        org_ids = [user_fav_org.fav_id for user_fav_org in user_fav_orgs]
+        my_fav_orgs = Organization.objects.filter(id__in=org_ids)
+        context = {
+            'my_fav_orgs': my_fav_orgs,
+        }
+        return render(request, 'users/usercenter_fav_org.html', context=context)
+
+
+class MyFavTeacherView(View):
+    def get(self, request):
+        user_fav_teachers = UserFavorite.objects.filter(user=request.user, fav_type=3)
+        teacher_ids = [user_fav_teacher.fav_id for user_fav_teacher in user_fav_teachers]
+        my_fav_teachers = Teacher.objects.filter(id__in=teacher_ids)
+        context = {
+            'my_fav_teachers': my_fav_teachers,
+        }
+        return render(request, 'users/usercenter_fav_teacher.html', context=context)
+
+
+class MyFavCourseView(View):
+    def get(self, request):
+        user_fav_courses = UserFavorite.objects.filter(user=request.user, fav_type=2)
+        course_ids = [user_fav_course.fav_id for user_fav_course in user_fav_courses]
+        my_fav_courses = Course.objects.filter(id__in=course_ids)
+        context = {
+            'my_fav_courses': my_fav_courses,
+        }
+        return render(request, 'users/usercenter_fav_course.html', context=context)
+
+
+class MyMessageView(View):
+    def get(self, request):
+        user_messages = UserMessage.objects.filter(user=request.user.id)
+
+        # 翻页功能
+        paginator = Paginator(user_messages, 3)
+        page = request.GET.get('page')
+        user_messages = paginator.get_page(page)
+
+        context = {
+            'my_messages': user_messages,
+        }
+        return render(request, 'users/usercenter_message.html', context=context)
+
+
+def pag_not_found(request):
+    response = render_to_response('404.html', {})
+    response.status_code = 404
+    return response
+
+
+def page_error(request):
+    response = render_to_response('500.html', {})
+    response.status_code = 500
+    return response

@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime
 from organization.models import Organization, Teacher
 from django.utils.html import format_html
+from ckeditor.fields import RichTextField
 
 
 # Create your models here.
@@ -15,7 +16,7 @@ class Course(models.Model):
     teacher = models.ForeignKey(Teacher, verbose_name="授课教师", on_delete=models.CASCADE)
     name = models.CharField(verbose_name="名称", max_length=50)
     desc = models.CharField(verbose_name="课程描述", max_length=255)
-    detail = models.TextField(verbose_name="课程详情")
+    detail = RichTextField(null=True, blank=True)
     image = models.ImageField(verbose_name="封面图", upload_to='course/%Y/%m')
     degree = models.CharField(verbose_name="难度", choices=DEGREE_CHOICES, max_length=2, default='cj')
     is_banner = models.BooleanField(verbose_name="是否轮播", default=False)

@@ -28,7 +28,7 @@ SECRET_KEY = '#*wew895&l^+6%5eboh9ui-v8jc8ier=dwxw6v055%p!j8_=)p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # 由于复写了user模型，我们需要重载AUTH_USER_MODEL参数，导入我们复写后的模型
 AUTH_USER_MODEL = 'users.UserProfile'
@@ -58,6 +58,9 @@ INSTALLED_APPS = [
     'operation',
     # 验证码
     'captcha',
+    # 富文本编辑器CKeditor
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
@@ -77,12 +80,59 @@ MIDDLEWARE = [
 EMAIL_HOST = 'smtp.126.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'wolfking816@126.com'
-EMAIL_HOST_PASSWORD = 'simon'
+EMAIL_HOST_PASSWORD = 'simondmhz816'
 EMAIL_USER_TLS = True
 EMAIL_FROM = 'wolfking816@126.com'
 
 
 ROOT_URLCONF = 'MxOnline2.urls'
+
+# 富文本设置
+# CKEDITOR_CONFIGS = {
+#     'awesome_ckeditor': {
+#         'toolbar': 'Basic',
+#     },
+# }
+CKEDITOR_CONFIGS = {
+    'default': {
+        'language': 'zh-cn',
+        'toolbar_YourCustomToolbarConfig': [
+
+            {'name': 'clipboard', 'items': ['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord']},
+            {'name': 'paragraph', 'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']},
+            {'name': 'insert', 'items': ['Image', 'Table', 'HorizontalRule', 'Smiley']},
+            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
+            {'name': 'editing', 'items': ['Find', 'Replace', '-']},
+            {'name': 'tools', 'items': ['Maximize']},
+            '/',
+            {'name': 'styles', 'items': ['Format', 'Font', 'FontSize']},
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat']},
+            {'name': 'colors', 'items': ['TextColor', 'BGColor']},
+            {'name': 'paragraph',
+             'items': ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']},
+            {'name': 'document', 'items': ['Source']},
+        ],
+        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
+        'width': '100%',
+        'tabSpaces': 4,
+        'extraPlugins': ','.join([
+            'uploadimage',  # the upload image feature
+            # your extra plugins here
+            'div',
+            'autolink',
+            'autoembed',
+            'embedsemantic',
+            'autogrow',
+            'widget',
+            'lineutils',
+            'clipboard',
+            'dialog',
+            'dialogui',
+            'elementspath'
+        ]),
+    }
+}
 
 # 配置templates路径
 TEMPLATES = [
@@ -161,12 +211,15 @@ USE_TZ = True
 
 # 配置静态文件路径
 # STATIC_URL的作用是映射静态文件的url，只在templates中引用的时候用到，其用法与MEDIA_URL相同。
-# STATICFILES_DIRS的作用是由于我们在app之外设置了其它的static目录。由于django在运行某个app的html时会默认查找这个app下的’static‘目录，所以在app之外的static需要我们自己配置。这个用法在DEBUG=TRUE时生效，FALSE时django则不会代管静态文件，所以，在部署时会用到STATIC_ROOT。STATICFILES_DIRS的用法与TEMPLATES_DIRS相同。
+# STATICFILES_DIRS的作用是由于我们在app之外设置了其它的static目录。由于django在运行某个app的html时会默认查找这个app下的’static'目录，所以在app之外的static需要我们自己配置。这个用法在DEBUG=TRUE时生效，FALSE时django则不会代管静态文件，所以，在部署时会用到STATIC_ROOT。STATICFILES_DIRS的用法与TEMPLATES_DIRS相同。
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # 配置上传的媒体路径
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# ckeditor文件上传路径
+CKEDITOR_UPLOAD_PATH = 'uploads/'

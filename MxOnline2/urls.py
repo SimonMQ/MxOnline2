@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
+from django.conf.urls import url
 import users.urls, organization.urls, course.urls
 from users.views import IndexView, LoginView, LogoutView, RegisterView, ActiveUserView, ForgetPwdView, ResetPwdView, ModifyPwdView
 from django.views.static import serve
@@ -33,11 +34,16 @@ urlpatterns = [
     path('modify_pwd/', ModifyPwdView.as_view(), name='modify_pwd'),
     path('captcha/', include('captcha.urls')),
 
-    # 配置图片路径
+    # 配置图片路径、静态文件路径
     re_path(r'^media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
+    re_path(r'^static/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
 
     path('users/', include(users.urls, namespace='users')),
     path('organization/', include(organization.urls, namespace='organization')),
     path('course/', include(course.urls, namespace='course')),
-
+    # 富文本ckeditor配置url
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 ]
+
+handler404 = 'users.views.pag_not_found'
+handler500 = 'users.views.page_error'
